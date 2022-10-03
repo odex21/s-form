@@ -1,0 +1,4 @@
+stats.html
+node_modules
+.pnpm-debug.log
+**/dist/*

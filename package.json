@@ -1,0 +1,20 @@
+{
+  "name": "@s-form/monorepo",
+  "version": "0.0.1",
+  "license": "MIT",
+  "type": "module",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "vite build",
+    "precommit": "lint-staged"
+  },
+  "devDependencies": {
+    "async-validator": "4.0.7",
+    "prettier": "^2.7.1",
+    "vitest": "^0.23.4",
+    "vue": "^3.2.39"
+  },
+  "dependencies": {
+    "@s-form/core": "workspace:*"
+  }
+}
