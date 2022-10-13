@@ -1,5 +1,5 @@
 import { defineFormTypes } from '@s-form/core'
-import { ElButton, ElInput } from 'element-plus'
+import { ElButton, ElInput, ElPagination } from 'element-plus'
 
 export const useDefineSchema = defineFormTypes({
   input: {
@@ -7,5 +7,8 @@ export const useDefineSchema = defineFormTypes({
   },
   button: {
     component: ElButton,
+  },
+  pagination: {
+    component: ElPagination,
   },
 })

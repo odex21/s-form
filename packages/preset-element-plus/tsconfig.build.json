@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "esnext",
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "moduleResolution": "Node",
+    "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "preserveSymlinks": true,
+    "rootDir": "src",
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "noUnusedLocals": true,
+    "outDir": "dist",
+    // "composite": true,
+    "skipLibCheck": true,
+    "emitDeclarationOnly": true
+  },
+  "include": [
+    "src/"
+  ],
+}

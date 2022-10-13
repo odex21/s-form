@@ -11,7 +11,7 @@
     <div class="flex-1 relative">
       <slot />
       <div v-if="data?.$anyInvalid && data.$dirty" class="error-msg">
-        {{ data.$errors[0] }}
+        {{ data.$message }}
       </div>
     </div>
   </div>

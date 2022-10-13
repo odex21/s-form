@@ -1,5 +1,5 @@
 import { markRaw } from 'vue'
-import { CustomCompData, FormItemType } from './types'
+import { type CustomCompData, FormItemType } from './types'
 
 /**
  * @example
@@ -18,7 +18,7 @@ import { CustomCompData, FormItemType } from './types'
  */
 export const useCustomItem = <C = any>(
   data: Omit<CustomCompData<C>, 'type'>
-) => ({
+): CustomCompData<C> => ({
   ...data,
   component: markRaw(data.component as any),
   type: FormItemType.CUSTOM,

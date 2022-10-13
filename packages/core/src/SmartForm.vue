@@ -14,7 +14,7 @@
       :disabled="disabled"
       :model-value="modelValue[item.key]"
       :light="light"
-      @update:model-value="(e) => updateItem(item.key, e)"
+      @update:model-value="(e, modelKey) => updateItem(modelKey ?? item.key, e)"
     >
       <template #label="data">
         <slot name="label" v-bind="data" />
@@ -31,20 +31,27 @@ import { LabelPoistion, provideFormState } from './inject'
 import ItemRenderVue from './ItemRender.vue'
 import { ItemRenderState } from './ItemRenderState'
 import { ref, computed, reactive } from 'vue'
+import type { Rules } from 'async-validator'
 
 const props = withDefaults(
   defineProps<{
     formSchema: FormSchema
-    modelValue: Record<string, any>
+    modelValue?: Record<string, any>
     disabled?: boolean
     labelWidth?: string | number
     labelPosition?: LabelPoistion
     itemClass?: string
+    /**
+     * 如果为真，不会自动更新model
+     * @default  false
+     */
     light?: boolean
+    rules?: Rules
   }>(),
   {
     disabled: false,
     light: false,
+    modelValue: () => ({}),
   }
 )
 
@@ -74,6 +81,8 @@ provideFormState({
   ),
   labelPosition: computed(() => props.labelPosition ?? 'left'),
   itemClass: computed(() => props.itemClass),
+  modelValue: computed(() => props.modelValue),
+  rules: computed(() => props.rules ?? {}),
 })
 
 const items = ref<Record<string, ItemRenderState>>({})
@@ -84,7 +93,6 @@ const setItems = (e: any, p: string) => {
 const updateItem = (key: string, v: any) => {
   // eslint-disable-next-line vue/no-mutating-props
   props.modelValue[key] = v
-  console.log('update', key, v)
 }
 
 /**

@@ -25,6 +25,8 @@ export type SmartFormState = {
   labelWidth: Ref<string>
   labelPosition: Ref<LabelPoistion>
   itemClass: Ref<string | undefined>
+  modelValue: Ref<Record<string, any>>
+  rules: Ref<Record<string, any>>
 }
 
 export type LabelPoistion = 'left' | 'top' | 'sticky' | 'none'
@@ -44,4 +46,6 @@ export const useSmartFormState = () =>
     labelWidth: computed(() => '20px'),
     itemClass: ref(''),
     emit: () => {},
+    modelValue: ref({}),
+    rules: ref({}),
   })

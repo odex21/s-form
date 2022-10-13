@@ -15,15 +15,30 @@
     "declaration": true,
     "declarationDir": "./types",
     "resolveJsonModule": true,
+    "preserveSymlinks": true,
     "rootDir": ".",
     "baseUrl": ".",
     "jsx": "preserve",
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
     "noUnusedLocals": true,
     "paths": {
       "@s-form/core": [
         "./packages/core/src/index.ts"
+      ],
+      "@s-form/preset-element-plus": [
+        "./packages/preset-element-plus/src/index.ts"
+      ],
+      "async-validator": [
+        "./node_modules/async-validator"
+      ],
+      "element-plus": [
+        "./node_modules/element-plus/es/index.d.ts"
+      ],
+      "element-plus/es/utils": [
+        "./node_modules/element-plus/es/utils"
+      ],
+      "@vue/*": [
+        "./node_modules/@vue/*"
       ]
     },
     "types": [

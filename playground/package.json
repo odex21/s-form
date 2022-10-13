@@ -1,18 +1,52 @@
 {
-  "private": true,
+  "name": "playground",
+  "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "serve": "vite preview"
+    "build": "run-p type-check build-only",
+    "preview": "vite preview --port 4173",
+    "test:unit": "vitest --environment jsdom",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "element-plus": "^2.2.17",
-    "vue": "^3.2.39"
+    "@element-plus/icons-vue": "^2.0.10",
+    "@s-form/core": "workspace:^0.0.1",
+    "@s-form/preset-element-plus": "workspace:^0.0.1",
+    "@vueuse/core": "^8.5.0",
+    "async-validator": "^4.2.5",
+    "element-plus": "^2.2.18",
+    "pinia": "^2.0.21",
+    "vue": "^3.2.41",
+    "vue-router": "^4.1.5"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^3.1.0",
-    "vite": "3.0.9",
+    "@rushstack/eslint-patch": "^1.1.4",
+    "@types/jsdom": "^20.0.0",
+    "@types/markdown-it": "^12.2.3",
+    "@types/node": "^16.11.56",
+    "@vitejs/plugin-vue": "^3.0.3",
+    "@vitejs/plugin-vue-jsx": "^2.0.1",
+    "@vue/eslint-config-prettier": "^7.0.0",
+    "@vue/eslint-config-typescript": "^11.0.0",
+    "@vue/test-utils": "^2.0.2",
+    "@vue/tsconfig": "^0.1.3",
+    "@yankeeinlondon/builder-api": "^0.4.1",
+    "@yankeeinlondon/code-builder": "^1.0.7",
+    "eslint": "^8.22.0",
+    "eslint-plugin-vue": "^9.3.0",
+    "happy-dom": "^7.4.0",
+    "jsdom": "^20.0.0",
+    "markdown-it-shiki": "^0.5.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.7.1",
+    "shiki": "^0.11.1",
+    "typescript": "~4.7.4",
+    "vite": "^3.0.9",
+    "vite-plugin-md": "^0.20.4",
     "vite-plugin-windicss": "^1.8.8",
-    "windicss": "^3.5.6"
+    "vitest": "^0.23.0",
+    "vue-tsc": "^0.40.7"
   }
 }

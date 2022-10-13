@@ -15,17 +15,14 @@
     <div class="flex">
       <component
         :is="item.component"
-        :[key]="model.$value"
-        @[key]="update"
-        v-bind="mergeProps(proxyRefs(item.props ?? {}), item.attrs ?? {})"
+        v-bind="
+          mergeProps(proxyRefs(item.props ?? {}), item.attrs ?? {}, vModelProps)
+        "
       >
-        <template v-if="typeof item.slot === 'string'">
-          {{ item.slot }}
+        <component v-if="item.slot" :is="slotItem(item.slot)"></component>
+        <template v-for="(k, name) in item.slots" v-slot:[name]>
+          <component :is="slotItem(k)"></component>
         </template>
-        <component
-          v-else-if="['object', 'function'].includes(typeof item.slot)"
-          :is="item.slot"
-        />
       </component>
 
       <slot name="append" v-bind="{ item, model: model.$value }" />
@@ -43,13 +40,16 @@ import {
   shallowRef,
   computed,
   ref,
-  watch,
   mergeProps,
   toRef,
+  nextTick,
+  defineComponent,
+  h,
 } from 'vue'
 import { sleep } from './utils'
 import schmea from 'async-validator'
 import { ValidateModel } from './FormItem/type'
+import { pausableWatch, type WatchPausableReturn } from '@vueuse/core'
 
 const props = defineProps<{
   item: FormItemData
@@ -58,58 +58,116 @@ const props = defineProps<{
   light: boolean
 }>()
 
-const key = props.item.modelValueKey ?? 'modelValue'
-
-const { labelPosition, labelWidth, itemClass, emit } = useSmartFormState()
+const { labelPosition, labelWidth, itemClass, emit, modelValue, rules } =
+  useSmartFormState()
 
 const itemEmit = defineEmits<{
-  (name: 'update:modelValue', e: any): void
+  (name: 'update:modelValue', e: any, modelKey?: string): void
 }>()
 
 const createValidation = () => {
-  const { rules } = props.item
-
-  const validator: Record<string, any> = {}
-  if (rules) {
-    validator.validate = async (v: any) => {
-      const validator = new schmea({ [props.item.key]: rules })
-      const res = await validator
-        .validate({ [props.item.key]: v }, { first: true })
-        .then(() => true)
-        .catch(({ errors, fields }) => {
-          return errors
-        })
-      return res
+  const { modelKeyMap, key } = props.item
+  if (modelKeyMap) {
+    const data: Record<string, any> = {}
+    Object.entries(modelKeyMap).forEach(([modelValueKey, modelKey]) => {
+      const r = rules.value[key] ?? {}
+      const validator: Record<string, any> = {}
+      if (Object.keys(r).length) {
+        validator.validate = createRules(r)
+      }
+      data[modelValueKey] = {
+        $value: modelValue.value[modelKey],
+        ...validator,
+      }
+    })
+    return useValidation(data) as any as ValidateModel
+    // return use
+  } else {
+    const validator: Record<string, any> = {}
+    const r = Object.assign(props.item.rules ?? {}, rules.value[key] ?? {})
+    if (Object.keys(r).length) {
+      validator.validate = createRules(r)
     }
+
+    const value = props.modelValue ?? props.item.initial ?? ''
+    return useValidation({
+      $value: value,
+      ...validator,
+    }) as any as ValidateModel
   }
-  const value = props.modelValue ?? props.item.initial ?? ''
-  return useValidation({
-    $value: value,
-    ...validator,
-  }) as any as ValidateModel
 }
 
 const model = shallowRef<ReturnType<typeof createValidation>>({} as any)
-// let stopModelWatch: ReturnType<typeof watchModelChange>
 
-const update = (cur: any) => {
+const update = (cur: any, modelValueKey?: string) => {
   emit('itemChange', props.item.key, cur, model.value.$value, props.item)
-  model.value.$value = cur
-  if (!props.light) itemEmit('update:modelValue', cur)
+  if (modelValueKey) {
+    //@ts-ignore
+    model.value[modelValueKey].$value = cur
+  } else {
+    model.value.$value = cur
+  }
+  if (!props.light) {
+    pausableReturn.pause()
+    itemEmit('update:modelValue', cur, props.item.modelKeyMap?.[modelValueKey!])
+
+    nextTick(() => {
+      pausableReturn.resume()
+    })
+  }
 }
 
-watch(
-  toRef(props, 'modelValue'), // 当modelValue 为undefined时，返回空字符串触发watch
-  (cur, prev) => {
-    if (cur === prev) return
+const watchHandler = (cur: Record<string, any>, prev?: Record<string, any>) => {
+  /**
+   * todo
+   * shallow compare
+   */
+  model.value = createValidation()
+}
 
-    model.value = createValidation()
-  },
-  {
-    //@ts-ignore
-    immediate: true,
+let pausableReturn: WatchPausableReturn
+if (props.item.modelKeyMap) {
+  pausableReturn = pausableWatch(
+    modelValue, // 当modelValue 为undefined时，返回空字符串触发watch
+    watchHandler,
+    {
+      immediate: true,
+      deep: true,
+    }
+  )
+} else {
+  pausableReturn = pausableWatch(
+    toRef(props, 'modelValue'),
+    (cur, prev) => {
+      if (cur === prev) return
+      model.value = createValidation()
+    },
+    {
+      immediate: true,
+    }
+  )
+}
+
+const vModelProps = computed(() => {
+  const { modelValueKey, modelKeyMap } = props.item
+  const data: Record<string, any> = {}
+  if (modelKeyMap) {
+    Object.entries(modelKeyMap).forEach(([_modelValueKey, modelKey]) => {
+      //@ts-ignore
+      data[_modelValueKey] = model.value[_modelValueKey].$value
+      data[`onUpdate:${_modelValueKey}`] = (cur: any) => {
+        update(cur, _modelValueKey)
+      }
+    })
+  } else if (modelValueKey) {
+    data[modelValueKey] = model.value.$value
+    data[`onUpdate:${modelValueKey}`] = update
+  } else {
+    data.modelValue = model.value.$value
+    data['onUpdate:modelValue'] = update
   }
-)
+  return data
+})
 
 const formItemClass = computed(() => {
   return [itemClass.value, props.item.itemClass].filter((e) => e).join(' ')
@@ -146,4 +204,35 @@ defineExpose({
   shake,
   formItemRef,
 })
+
+function createRules(r: Record<string, any>, modelValueKey?: string) {
+  return async (v: any) => {
+    const validator = new schmea({ [props.item.key]: r })
+    const res = await validator
+      .validate({ [props.item.key]: v }, { first: true })
+      .then(() => true)
+      .catch(({ errors, fields }) => {
+        console.error('erros', errors)
+        if (modelValueKey) {
+          //@ts-ignore
+          model.value[modelValueKey].$message = errors[0].message
+        } else {
+          model.value.$message = errors[0].message
+        }
+        return false // errors[0].message
+      })
+    return res
+  }
+}
+
+const slotItem = (slot: any) =>
+  defineComponent(() => () => {
+    // const { slot } = props.item
+    const __type = typeof slot
+    if (__type === 'string') {
+      return slot
+    } else if (['object', 'function'].includes(__type)) {
+      return h(slot)
+    }
+  })
 </script>

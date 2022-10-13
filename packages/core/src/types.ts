@@ -54,8 +54,10 @@ export type BaseFormItemData<T extends FormItemType> = {
 
   disabled?: boolean
   modelValueKey?: string
+  modelKeyMap?: Record<string, string>
 
   slot?: any
+  slots?: Record<string, any>
   attrs?: Record<string, any>
 
   /**
