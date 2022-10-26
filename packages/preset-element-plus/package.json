@@ -1,11 +1,11 @@
 {
   "name": "@s-form/preset-element-plus",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "type": "module",
   "typings": "dist/index.d.ts",
   "module": "dist/index.mjs",
   "dependencies": {
-    "@s-form/core": "workspace:^0.0.1"
+    "@s-form/core": "workspace:*"
   },
   "devDependencies": {
     "async-validator": "^4.2.5",

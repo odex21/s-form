@@ -23,8 +23,8 @@ type TT = () => <
     | 'pagination'
     | 'select'
     | 'datePicker'
-    | 'timePicker'
     | 'timeSelect'
+    | 'timePicker'
     | 'checkbox'
     | 'cascader'
     | 'switch'
@@ -73,6 +73,9 @@ type TT = () => <
           }
           rate: {
             component: typeof ElRate
+          }
+          slider: {
+            component: typeof ElSlider
           }
         }[T]['component'] extends import('vue').Component<
           infer P,

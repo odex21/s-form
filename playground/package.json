@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.10",
-    "@s-form/core": "workspace:^0.0.1",
-    "@s-form/preset-element-plus": "workspace:^0.0.1",
+    "@s-form/core": "workspace:*",
+    "@s-form/preset-element-plus": "workspace:*",
     "@vueuse/core": "^8.5.0",
     "async-validator": "^4.2.5",
     "element-plus": "^2.2.18",
