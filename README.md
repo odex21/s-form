@@ -7,7 +7,10 @@ npm i @s-form/core @s-form/preset-element-plus
 ```
 
 ```ts
-import { useDefineSchema } from '@s-form/preset-element-plus'
+import { useDefineSchema, SmartForm } from '@s-form/preset-element-plus'
+//import base style
+import '@s-form/core/style'
+
 const schema = useDefineSchema()([
   {
     label: '输入框',
