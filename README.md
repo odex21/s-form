@@ -3,11 +3,12 @@
 
 ## Usage
 ```bash
-npm i @s-form/core @s-form/preset-element-plus
+npm i @s-form/core @s-form/preset-element-plus element-plus
 ```
 
 ```ts
-import { useDefineSchema, SmartForm } from '@s-form/preset-element-plus'
+import { SmartForm } from '@s-form/core'
+import { useDefineSchema } from '@s-form/preset-element-plus'
 //import base style
 import '@s-form/core/style'
 
